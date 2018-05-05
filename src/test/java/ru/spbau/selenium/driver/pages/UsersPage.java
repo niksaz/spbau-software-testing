@@ -11,7 +11,7 @@ import ru.spbau.selenium.data.User;
 import ru.spbau.selenium.driver.WebDriverEntity;
 import ru.spbau.selenium.driver.elements.CreateNewUserForm;
 
-/** Represents YouTrack /users page. */
+/** Represents the YouTrack /users page. */
 public class UsersPage extends WebDriverEntity {
   private static final By createUserButtonSelector = By.id("id_l.U.createNewUser");
 

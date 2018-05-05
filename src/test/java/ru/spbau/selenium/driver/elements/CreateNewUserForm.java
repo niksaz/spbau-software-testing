@@ -8,7 +8,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import ru.spbau.selenium.data.User;
 import ru.spbau.selenium.driver.WebDriverEntity;
 
-/** An element of YouTrack /users page for registering a new user. */
+/** Represents the form for registering a new user. */
 public class CreateNewUserForm extends WebDriverEntity {
   private static final By okButtonSelector = By.id("id_l.U.cr.createUserOk");
 

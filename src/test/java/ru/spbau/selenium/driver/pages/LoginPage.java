@@ -8,7 +8,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import ru.spbau.selenium.data.User;
 import ru.spbau.selenium.driver.WebDriverEntity;
 
-/** Represents YouTrack /login page. */
+/** Represents the YouTrack /login page. */
 public class LoginPage extends WebDriverEntity {
   public LoginPage(WebDriver driver, WebDriverWait wait) {
     super(driver, wait);

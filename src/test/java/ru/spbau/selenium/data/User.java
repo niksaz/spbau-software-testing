@@ -1,5 +1,6 @@
 package ru.spbau.selenium.data;
 
+/** Represents a YouTrack user. */
 public class User {
   public final String login;
   public final String password;
