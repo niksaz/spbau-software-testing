@@ -1,4 +1,4 @@
-package ru.spbau.selenium;
+package ru.spbau.selenium.data;
 
 public class User {
   public final String login;

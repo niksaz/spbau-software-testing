@@ -7,7 +7,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import ru.spbau.selenium.User;
+import ru.spbau.selenium.data.User;
 import ru.spbau.selenium.driver.WebDriverEntity;
 import ru.spbau.selenium.driver.elements.CreateNewUserForm;
 
@@ -36,11 +36,9 @@ public class UsersPage extends WebDriverEntity {
     wait.until(ExpectedConditions.urlContains("/users"));
   }
 
-  public void ensureUserTableContains(User user) {
+  public boolean userTableContains(User user) {
     WebElement userTableRow = findUserTableRow(user);
-    if (userTableRow == null) {
-      throw new AssertionError("there is not such user in the table: " + user);
-    }
+    return userTableRow != null;
   }
 
   public void registerUser(User user) {
@@ -63,6 +61,7 @@ public class UsersPage extends WebDriverEntity {
     wait.until(ExpectedConditions.alertIsPresent());
     Alert alert = driver.switchTo().alert();
     alert.accept();
+    wait.until(ExpectedConditions.stalenessOf(userTableRow));
   }
 
   private WebElement findUserTableRow(User user) {

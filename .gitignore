@@ -1,7 +1,7 @@
 .gradle/
 .idea/
 build/
-*.iml
+out/
 
 drivers/*
 !drivers/.gitkeep

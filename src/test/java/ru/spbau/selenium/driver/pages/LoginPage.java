@@ -5,7 +5,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import ru.spbau.selenium.User;
+import ru.spbau.selenium.data.User;
 import ru.spbau.selenium.driver.WebDriverEntity;
 
 /** Represents YouTrack /login page. */
