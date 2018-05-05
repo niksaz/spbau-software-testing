@@ -13,6 +13,8 @@ import ru.spbau.selenium.driver.elements.CreateNewUserForm;
 
 /** Represents YouTrack /users page. */
 public class UsersPage extends WebDriverEntity {
+  private static final By createUserButtonSelector = By.id("id_l.U.createNewUser");
+
   public UsersPage(WebDriver driver, WebDriverWait wait) {
     super(driver, wait);
   }
@@ -42,11 +44,27 @@ public class UsersPage extends WebDriverEntity {
   }
 
   public void registerUser(User user) {
-    WebElement createUserButton = driver.findElement(By.id("id_l.U.createNewUser"));
+    WebElement createUserButton = driver.findElement(createUserButtonSelector);
     createUserButton.click();
 
     CreateNewUserForm createNewUserForm = new CreateNewUserForm(driver, wait);
     createNewUserForm.registerUser(user);
+  }
+
+  public void registerUserWithMessageError(User user) {
+    WebElement createUserButton = driver.findElement(createUserButtonSelector);
+    createUserButton.click();
+
+    CreateNewUserForm createNewUserForm = new CreateNewUserForm(driver, wait);
+    createNewUserForm.registerUserWithMessageError(user);
+  }
+
+  public void registerUserWithBulbError(User user) {
+    WebElement createUserButton = driver.findElement(createUserButtonSelector);
+    createUserButton.click();
+
+    CreateNewUserForm createNewUserForm = new CreateNewUserForm(driver, wait);
+    createNewUserForm.registerUserWithBulbError(user);
   }
 
   public void deleteUser(User user) {

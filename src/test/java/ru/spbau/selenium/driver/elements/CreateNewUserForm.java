@@ -10,11 +10,37 @@ import ru.spbau.selenium.driver.WebDriverEntity;
 
 /** An element of YouTrack /users page for registering a new user. */
 public class CreateNewUserForm extends WebDriverEntity {
+  private static final By okButtonSelector = By.id("id_l.U.cr.createUserOk");
+
   public CreateNewUserForm(WebDriver driver, WebDriverWait wait) {
     super(driver, wait);
   }
 
   public void registerUser(User user) {
+    enterUserData(user);
+
+    WebElement okButton = driver.findElement(okButtonSelector);
+    okButton.click();
+    wait.until(ExpectedConditions.urlContains("/editUser"));
+  }
+
+  public void registerUserWithMessageError(User user) {
+    enterUserData(user);
+
+    WebElement okButton = driver.findElement(okButtonSelector);
+    okButton.click();
+    wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".message.error")));
+  }
+
+  public void registerUserWithBulbError(User user) {
+    enterUserData(user);
+
+    WebElement okButton = driver.findElement(okButtonSelector);
+    okButton.click();
+    wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".error-bulb2")));
+  }
+
+  private void enterUserData(User user) {
     By loginFieldSelector = By.id("id_l.U.cr.login");
     wait.until(ExpectedConditions.visibilityOfElementLocated(loginFieldSelector));
 
@@ -25,9 +51,5 @@ public class CreateNewUserForm extends WebDriverEntity {
     loginField.sendKeys(user.login);
     passwordField.sendKeys(user.password);
     confirmPasswordField.sendKeys(user.password);
-
-    WebElement okButton = driver.findElement(By.id("id_l.U.cr.createUserOk"));
-    okButton.click();
-    wait.until(ExpectedConditions.urlContains("/editUser"));
   }
 }

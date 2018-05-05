@@ -1,7 +1,9 @@
 package ru.spbau.selenium;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collections;
 import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.Before;
@@ -17,12 +19,13 @@ import ru.spbau.selenium.driver.pages.UsersPage;
 public class YouTrackUsersTest {
   private static final Logger logger = Logger.getLogger(YouTrackUsersTest.class.getName());
   private static final String INITIAL_URL = "http://localhost:8080";
+  private static final int MAX_LOGIN_LENGTH = 50;
 
   private static final User rootUser = new User("root", "root");
   private static final User guestUser = new User("guest", "guest");
 
   private static WebDriver driver;
-  private static WebDriverWait wait;
+  private static UsersPage usersPage;
 
   @BeforeClass
   public static void configureChromeDriver() {
@@ -39,7 +42,7 @@ public class YouTrackUsersTest {
   @Before
   public void setUp() {
     driver = new ChromeDriver();
-    wait = new WebDriverWait(driver, 5);
+    WebDriverWait wait = new WebDriverWait(driver, 5);
 
     driver.get(INITIAL_URL);
     logger.info("currentUrl is " + driver.getCurrentUrl());
@@ -47,31 +50,27 @@ public class YouTrackUsersTest {
     LoginPage loginPage = new LoginPage(driver, wait);
     loginPage.loginUser(rootUser);
     logger.info("currentUrl is " + driver.getCurrentUrl());
+
+    usersPage = new UsersPage(driver, wait);
+    usersPage.bringPageUp();
+    logger.info("currentUrl is " + driver.getCurrentUrl());
   }
 
   @Test
   public void baseUsersArePresent() {
-    UsersPage usersPage = new UsersPage(driver, wait);
-    usersPage.bringPageUp();
-    logger.info("currentUrl is " + driver.getCurrentUrl());
-
     assertTrue(usersPage.userTableContains(rootUser));
     assertTrue(usersPage.userTableContains(guestUser));
   }
 
   @Test
   public void registerTwoUsers() {
-    UsersPage usersPage = new UsersPage(driver, wait);
-    usersPage.bringPageUp();
-    logger.info("currentUrl is " + driver.getCurrentUrl());
-
     User userA = new User("userA", "userA");
     usersPage.registerUser(userA);
     logger.info("currentUrl is " + driver.getCurrentUrl());
     usersPage.bringPageUp();
     logger.info("currentUrl is " + driver.getCurrentUrl());
 
-    usersPage.userTableContains(userA);
+    assertTrue(usersPage.userTableContains(userA));
 
     User userB = new User("userB", "userB");
     usersPage.registerUser(userB);
@@ -79,10 +78,106 @@ public class YouTrackUsersTest {
     usersPage.bringPageUp();
     logger.info("currentUrl is " + driver.getCurrentUrl());
 
-    usersPage.userTableContains(userB);
+    assertTrue(usersPage.userTableContains(userB));
 
     usersPage.deleteUser(userA);
     usersPage.deleteUser(userB);
+
+    assertFalse(usersPage.userTableContains(userA));
+    assertFalse(usersPage.userTableContains(userB));
+  }
+
+  @Test
+  public void registerNumericalUser() {
+    User numericalUser = new User("12345", "12345");
+    registerSingleUser(numericalUser);
+  }
+
+  @Test
+  public void registerCyrillicLettersLoginUser() {
+    User cyrillicUser = new User("Владимир", "vlad");
+    registerSingleUser(cyrillicUser);
+  }
+
+  @Test
+  public void registerChineseLettersLoginUser() {
+    User chineseUser = new User("漢字", "characters");
+    registerSingleUser(chineseUser);
+  }
+
+  @Test
+  public void registerSymbolicLoginUser() {
+    User symbolicUser = new User("+-?()", "symbol");
+    registerSingleUser(symbolicUser);
+  }
+
+  @Test
+  public void registerMaxLengthLoginUser() {
+    User maxUser =
+      new User(
+        String.join("", Collections.nCopies(MAX_LOGIN_LENGTH, "a")),
+        "maximum");
+    registerSingleUser(maxUser);
+  }
+
+  private void registerSingleUser(User user) {
+    usersPage.registerUser(user);
+    logger.info("currentUrl is " + driver.getCurrentUrl());
+    usersPage.bringPageUp();
+    logger.info("currentUrl is " + driver.getCurrentUrl());
+
+    assertTrue(usersPage.userTableContains(user));
+
+    usersPage.deleteUser(user);
+
+    assertFalse(usersPage.userTableContains(user));
+  }
+
+  @Test
+  public void registerLongerThanMaxLengthLoginUser() {
+    User longUser =
+      new User(
+        String.join("", Collections.nCopies(MAX_LOGIN_LENGTH, "a")) +
+          String.join("", Collections.nCopies(MAX_LOGIN_LENGTH, "b")),
+        "maximum");
+    usersPage.registerUser(longUser);
+    logger.info("currentUrl is " + driver.getCurrentUrl());
+    usersPage.bringPageUp();
+    logger.info("currentUrl is " + driver.getCurrentUrl());
+
+    User trimmedUser =
+      new User(
+        String.join("", Collections.nCopies(MAX_LOGIN_LENGTH, "a")),
+        "maximum");
+    assertTrue(usersPage.userTableContains(trimmedUser));
+
+    usersPage.deleteUser(trimmedUser);
+
+    assertFalse(usersPage.userTableContains(trimmedUser));
+  }
+
+  @Test
+  public void startSpaceNotAllowedInLogin() {
+    User spaceUser = new User(" Peter", "12345");
+    usersPage.registerUserWithMessageError(spaceUser);
+  }
+
+  @Test
+  public void middleSpaceNotAllowedInLogin() {
+    User spaceUser = new User("Peter Johnson", "12345");
+    usersPage.registerUserWithMessageError(spaceUser);
+  }
+
+  @Test
+  public void endSpaceNotAllowedInLogin() {
+    User spaceUser = new User("Johnson ", "12345");
+    usersPage.registerUserWithMessageError(spaceUser);
+  }
+
+  @Test
+  public void emptyLoginNotAllowed() {
+    User noLoginUser = new User("", "9876");
+    usersPage.registerUserWithBulbError(noLoginUser);
   }
 
   @After
